@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+import API_BASE from "../config";
 import {
   ResponsiveContainer,
   BarChart,
