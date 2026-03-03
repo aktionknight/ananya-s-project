@@ -1,19 +1,51 @@
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const app = express();
 
+// Validate required environment variables
+if (!process.env.MONGO_URI) {
+  console.error("ERROR: MONGO_URI is not defined in .env file");
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.error("ERROR: JWT_SECRET is not defined in .env file");
+  process.exit(1);
+}
+
+// CORS configuration - improved to handle preflight requests
 app.use(cors({
   origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 
+// Middleware to parse JSON
 app.use(express.json());
 
+// Load models
+require("./models/User");
+require("./models/Transaction");
+require("./models/Budget");
+require("./models/Alert");
+
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
+
+// Import routes
+const userRoutes = require("./routes/userRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
+const budgetRoutes = require("./routes/budgetRoutes");
 const alertRoutes = require("./routes/alertRoutes");
 const insightRoutes = require("./routes/insightRoutes");
 const aiRoutes = require("./routes/aiRoutes");
@@ -21,19 +53,10 @@ const anomalyRoutes = require("./routes/anomalyRoutes");
 const predictionRoutes = require("./routes/predictionRoutes");
 const healthRoutes = require("./routes/healthRoutes");
 const strategyRoutes = require("./routes/strategyRoutes");
-const express =  require("express");
-require("./models/User");
-require("./models/Transaction");
-require("./models/Budget");
-require("./models/Alert");
 
-
-
-
-//middleware to read JSON from requests
-const userRoutes = require("./routes/userRoutes");
+// Register routes
+app.use("/api/users", userRoutes);
 app.use("/api/transactions", transactionRoutes);
-const budgetRoutes = require("./routes/budgetRoutes");
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/insights", insightRoutes);
@@ -43,25 +66,27 @@ app.use("/api/predict", predictionRoutes);
 app.use("/api/health-score", healthRoutes);
 app.use("/api/strategy", strategyRoutes);
 
-
-
-
-//connect mongodb
-const mongoose = require("mongoose");
-
-mongoose
-.connect(process.env.MONGO_URI)
-.then(()=> console.log("MongoDB connected"))
-.catch(err => console.error("MongoDB connection error:", err));
-app.use("/api/users", userRoutes);
-
-//test route
-app.get("/", (req, res) =>{
-    res.send("Personal Finance Tracker API is running");
+// Test route
+app.get("/", (req, res) => {
+  res.send("Personal Finance Tracker API is running");
 });
 
-//start the server 
-const PORT=  5000;
-app.listen(PORT, ()=> {
-    console.log(`Server running on port ${PORT}`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  res.status(err.status || 500).json({
+    message: err.message || "Internal server error",
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
