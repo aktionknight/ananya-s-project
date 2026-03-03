@@ -1,7 +1,4 @@
 const Transaction = require("../models/Transaction");
-const Budget = require("../models/Budget");
-const Alert = require("../models/Alert");
-const mongoose = require("mongoose");
 
 const getHealthScore = async (req, res) => {
   try {
@@ -20,92 +17,59 @@ const getHealthScore = async (req, res) => {
       date: { $gte: startDate, $lt: endDate }
     });
 
-    let totalIncome = 0;
-    let totalExpense = 0;
+    let income = 0;
+    let expense = 0;
 
     transactions.forEach(t => {
-      if (t.type === "income") totalIncome += t.amount;
-      else totalExpense += t.amount;
+      if (t.type === "income") income += t.amount;
+      if (t.type === "expense") expense += t.amount;
     });
 
-    const balance = totalIncome - totalExpense;
-
-    // 1️⃣ Savings Score
-    let savingsScore = 0;
-    if (totalIncome > 0) {
-      const savingsRate = (balance / totalIncome) * 100;
-
-      if (savingsRate > 30) savingsScore = 100;
-      else if (savingsRate > 20) savingsScore = 80;
-      else if (savingsRate > 10) savingsScore = 60;
-      else savingsScore = 30;
+    if (income === 0) {
+      return res.json({
+        score: 0,
+        grade: "D",
+        message: "No income recorded for this month."
+      });
     }
 
-    // 2️⃣ Budget Score
-    const alerts = await Alert.find({
-      user: req.user,
-      month
-    });
+    const savingsRate = ((income - expense) / income) * 100;
 
-    let budgetScore = 100;
+    let score = Math.round(savingsRate);
 
-    alerts.forEach(alert => {
-      if (alert.type === "WARNING") budgetScore -= 15;
-      if (alert.type === "EXCEEDED") budgetScore -= 30;
-    });
+    if (score < 0) score = 0;
+    if (score > 100) score = 100;
 
-    if (budgetScore < 0) budgetScore = 0;
+    let grade = "D";
 
-    // 3️⃣ Stability Score (Anomaly-based)
-    const anomalyData = await Transaction.aggregate([
-      {
-        $match: {
-          user: new mongoose.Types.ObjectId(req.user),
-          type: "expense",
-          date: { $gte: startDate, $lt: endDate }
-        }
-      },
-      {
-        $group: {
-          _id: "$category",
-          total: { $sum: "$amount" }
-        }
-      }
-    ]);
+    if (score >= 80) grade = "A";
+    else if (score >= 60) grade = "B";
+    else if (score >= 40) grade = "C";
 
-    let stabilityScore = anomalyData.length > 0 ? 80 : 60;
+    let message = "";
 
-    // Final Score (weighted)
-    const finalScore = Math.round(
-      savingsScore * 0.4 +
-      budgetScore * 0.3 +
-      stabilityScore * 0.3
-    );
+    if (savingsRate >= 50) {
+      message = "Excellent savings rate. You're managing money well.";
+    } else if (savingsRate >= 20) {
+      message = "Good savings rate. Try increasing savings slightly.";
+    } else if (savingsRate > 0) {
+      message = "Low savings rate. Consider reducing expenses.";
+    } else {
+      message = "You are spending more than you earn.";
+    }
 
-    let grade = "C";
-    if (finalScore >= 85) grade = "A";
-    else if (finalScore >= 70) grade = "B";
-    else if (finalScore >= 50) grade = "C";
-    else grade = "D";
-
-    let message = "Financial performance needs improvement.";
-    if (grade === "A") message = "Excellent financial discipline.";
-    else if (grade === "B") message = "Good financial stability with minor improvements needed.";
-
-    res.status(200).json({
-      score: finalScore,
+    res.json({
+      score,
       grade,
-      breakdown: {
-        savingsScore,
-        budgetScore,
-        stabilityScore
-      },
-      message
+      message,
+      savingsRate: savingsRate.toFixed(1),
+      income,
+      expense
     });
 
   } catch (error) {
-    console.error("Health Score Error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Health error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

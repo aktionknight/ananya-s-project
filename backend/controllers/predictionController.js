@@ -12,56 +12,72 @@ const getPrediction = async (req, res) => {
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 1);
 
+    // FILTER BY USER + MONTH
+    const transactions = await Transaction.find({
+      user: req.user,
+      date: { $gte: startDate, $lt: endDate }
+    });
+
+    let currentExpense = 0;
+
+    transactions.forEach(t => {
+      if (t.type === "expense") {
+        currentExpense += t.amount;
+      }
+    });
+
     const today = new Date();
+    const currentMonth = today.getMonth();
+    const selectedMonth = startDate.getMonth();
+
+    let daysPassed = 1;
+
+    if (currentMonth === selectedMonth) {
+      daysPassed = today.getDate();
+    } else {
+      daysPassed = 30; // full month assumption
+    }
+
     const daysInMonth = new Date(
       startDate.getFullYear(),
       startDate.getMonth() + 1,
       0
     ).getDate();
 
-    const daysPassed =
-      today.getMonth() === startDate.getMonth() &&
-      today.getFullYear() === startDate.getFullYear()
-        ? today.getDate()
-        : daysInMonth;
+    const dailyAverage = currentExpense / daysPassed;
 
-    const transactions = await Transaction.find({
-      user: req.user,
-      type: "expense",
-      date: { $gte: startDate, $lt: endDate }
-    });
-
-    const totalExpense = transactions.reduce(
-      (sum, t) => sum + t.amount,
-      0
-    );
-
-    if (daysPassed === 0) {
-      return res.status(200).json({
-        message: "No spending yet this month."
-      });
-    }
-
-    const dailyAverage = totalExpense / daysPassed;
     const projectedExpense = dailyAverage * daysInMonth;
 
-    let message = "Spending pace is normal.";
+    let paceStatus = "on_track";
 
-    if (projectedExpense > totalExpense * 1.2) {
-      message = "At current pace, spending may increase significantly.";
+    if (dailyAverage * daysInMonth > currentExpense * 1.3) {
+      paceStatus = "watch";
     }
 
-    res.status(200).json({
-      currentExpense: totalExpense,
+    let message = "";
+
+    if (projectedExpense > currentExpense * 1.5) {
+      message = "Spending trend increasing fast. Reduce discretionary expenses.";
+    } else if (projectedExpense > currentExpense) {
+      message = "Spending pace is moderate. Monitor daily expenses.";
+    } else {
+      message = "Spending pace is stable. You're on track.";
+    }
+
+    res.json({
+      currentExpense,
+      projectedExpense: projectedExpense.toFixed(0),
+      dailyAverage: dailyAverage.toFixed(0),
       daysPassed,
       daysInMonth,
-      projectedExpense: projectedExpense.toFixed(2),
+      daysRemaining: daysInMonth - daysPassed,
+      paceStatus,
       message
     });
 
   } catch (error) {
-    console.error("Prediction Error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Prediction error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
