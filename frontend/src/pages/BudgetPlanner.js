@@ -41,10 +41,7 @@ function BudgetPlanner() {
     if (!token) navigate("/");
   }, [navigate, token]);
 
-  // Load budget status whenever month changes
-  useEffect(() => {
-    fetchBudgetStatus();
-  }, [month]);
+
 
   const fetchBudgetStatus = async () => {
     setLoading(true);
