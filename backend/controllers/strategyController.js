@@ -34,7 +34,7 @@ const getStrategy = async (req, res) => {
     const categoryBreakdown = await Transaction.aggregate([
       {
         $match: {
-          user: new mongoose.Types.ObjectId(req.user),
+          user: new mongoose.Types.ObjectId(req.user._id),
           type: "expense",
           date: { $gte: startDate, $lt: endDate }
         }
@@ -48,7 +48,7 @@ const getStrategy = async (req, res) => {
     ]);
 
     const alerts = await Alert.find({
-      user: req.user,
+      user: req.user._id,
       month
     });
 
@@ -77,15 +77,54 @@ Create a clear 3-5 step actionable financial improvement strategy.
 Make it practical and structured.
 `;
 
-    const response = await axios.post("http://localhost:11434/api/generate", {
-      model: "llama3",
-      prompt: prompt,
-      stream: false
-    });
+    try {
+      const response = await axios.post("http://localhost:11434/api/generate", {
+        model: "llama3",
+        prompt: prompt,
+        stream: false
+      });
 
-    res.status(200).json({
-      strategy: response.data.response
-    });
+      res.status(200).json({
+        strategy: response.data.response
+      });
+
+    } catch (aiError) {
+      console.warn("Ollama connection failed, returning offline fallback strategy.");
+      // Generate dynamically tailored mock recommendations based on the actual categories & overspending alerts
+      const topCategories = categoryBreakdown.slice().sort((a,b) => b.total - a.total).slice(0, 2);
+      const categoryNames = topCategories.map(c => c._id).join(" and ");
+      
+      let strategy = `### Tailored Financial Action Plan (Offline Mode)
+
+`;
+      if (alerts.length > 0) {
+        const exceededCat = alerts.filter(a => a.type === "EXCEEDED").map(a => a.category).join(", ");
+        if (exceededCat) {
+          strategy += `1. **Urgent Budget Cap:** You have exceeded your budget for **${exceededCat}**. Immediately freeze discretionary purchases in these categories for the rest of this month.\n`;
+        } else {
+          strategy += `1. **Budget Warning Alert:** You have approached your limit in categories: **${alerts.map(a => a.category).join(", ")}**. Keep a strict watch on spending in the coming days.\n`;
+        }
+      } else {
+        strategy += `1. **Maintain Savings Discipline:** You currently have no active budget alerts. Keep following your general spending guidelines.\n`;
+      }
+
+      if (topCategories.length > 0) {
+        strategy += `2. **Analyze Key Expenses:** Your highest spending category is **${topCategories[0]._id}** (₹${topCategories[0].total.toLocaleString("en-IN")}). Focus on reducing this category by 10% next month through deliberate choices.\n`;
+      } else {
+        strategy += `2. **Create Category Budgets:** Head over to the Budget Planner and set limits for your main spending areas (Food, Transport, Rent, Shopping).\n`;
+      }
+
+      if (balance < 0) {
+        strategy += `3. **Income & Savings Stabilization:** Since you spent more than you earned this month, set up an immediate automated transfer of 15% of your next paycheck directly to a separate savings account to enforce "paying yourself first."\n`;
+      } else {
+        strategy += `3. **Surplus Optimization:** Since you saved ₹${balance.toLocaleString("en-IN")} this month, consider automating a SIP (Systematic Investment Plan) of ₹${Math.round(balance * 0.5).toLocaleString("en-IN")} into mutual funds or index funds to start growing your wealth compoundedly.\n`;
+      }
+      strategy += `4. **Review Subscriptions:** Go through all recurring bank statements and cancel any subscriptions you haven't actively used in the last 30 days.`;
+
+      res.status(200).json({
+        strategy
+      });
+    }
 
   } catch (error) {
     console.error("Strategy Error:", error);

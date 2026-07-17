@@ -1,0 +1,301 @@
+/* ==========================================
+   FINOVA NAVBAR
+========================================== */
+
+.navbar{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:calc(100% - 40px);
+    max-width:1450px;
+
+    height:88px;
+
+    padding:0 30px;
+
+    display:grid;
+    grid-template-columns:320px 1fr 320px;
+
+    align-items:center;
+
+    background:rgba(12,12,12,.88);
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:26px;
+
+    z-index:9999;
+}
+
+/* ==========================================
+LOGO
+========================================== */
+
+.navbar-left{
+    display:flex;
+    align-items:center;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    cursor:pointer;
+}
+
+.logo-icon{
+
+    width:60px;
+    height:60px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:18px;
+
+    background:#181818;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    transition:.35s;
+}
+
+.logo:hover .logo-icon{
+
+    transform:rotate(-6deg) scale(1.05);
+
+    box-shadow:0 0 30px rgba(34,197,94,.25);
+
+}
+
+.logo svg{
+
+    width:42px;
+    height:42px;
+
+}
+
+.logo-text{
+
+    display:flex;
+    flex-direction:column;
+
+}
+
+.logo-text h2{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:2rem;
+
+    font-weight:800;
+
+    line-height:1;
+
+}
+
+.logo-text p{
+
+    margin-top:6px;
+
+    color:#8d8d8d;
+
+    letter-spacing:5px;
+
+    font-size:.72rem;
+
+    text-transform:uppercase;
+
+}
+
+/* ==========================================
+CENTER
+========================================== */
+
+.navbar-center{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:55px;
+
+}
+
+.navbar-center a{
+
+    text-decoration:none;
+
+    color:#BDBDBD;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    position:relative;
+
+}
+
+.navbar-center a:hover{
+
+    color:white;
+
+}
+
+.navbar-center a::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-8px;
+
+    width:0;
+
+    height:2px;
+
+    border-radius:4px;
+
+    background:#22C55E;
+
+    transition:.3s;
+
+}
+
+.navbar-center a:hover::after{
+
+    width:100%;
+
+}
+
+/* ==========================================
+RIGHT
+========================================== */
+
+.navbar-right{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.login-btn{
+
+    padding:13px 24px;
+
+    background:transparent;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:14px;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.login-btn:hover{
+
+    background:#181818;
+
+}
+
+.signup-btn{
+
+    padding:14px 26px;
+
+    background:#22C55E;
+
+    color:#101010;
+
+    border:none;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-weight:700;
+
+    transition:.35s;
+
+}
+
+.signup-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 30px rgba(34,197,94,.35);
+
+}
+
+/* ==========================================
+RESPONSIVE
+========================================== */
+
+@media(max-width:1100px){
+
+    .navbar{
+
+        grid-template-columns:1fr auto;
+
+        padding:0 20px;
+
+    }
+
+    .navbar-center{
+
+        display:none;
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    .signup-btn{
+
+        display:none;
+
+    }
+
+    .logo-text p{
+
+        display:none;
+
+    }
+
+    .logo-text h2{
+
+        font-size:1.5rem;
+
+    }
+
+    .logo-icon{
+
+        width:52px;
+        height:52px;
+
+    }
+
+}

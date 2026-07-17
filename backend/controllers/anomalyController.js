@@ -22,7 +22,7 @@ const getAnomalies = async (req, res) => {
     const currentData = await Transaction.aggregate([
       {
         $match: {
-          user: new mongoose.Types.ObjectId(req.user),
+          user: new mongoose.Types.ObjectId(req.user._id),
           type: "expense",
           date: { $gte: currentStart, $lt: currentEnd }
         }
@@ -39,7 +39,7 @@ const getAnomalies = async (req, res) => {
     const previousData = await Transaction.aggregate([
       {
         $match: {
-          user: new mongoose.Types.ObjectId(req.user),
+          user: new mongoose.Types.ObjectId(req.user._id),
           type: "expense",
           date: { $gte: previousStart, $lt: previousEnd }
         }

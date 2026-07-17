@@ -32,7 +32,7 @@ const getInsights = async (req, res) => {
     const categoryBreakdown = await Transaction.aggregate([
       {
         $match: {
-          user: new mongoose.Types.ObjectId(req.user),
+          user: new mongoose.Types.ObjectId(req.user._id),
           type: "expense",
           date: { $gte: startDate, $lt: endDate }
         }
@@ -61,19 +61,38 @@ Give a short financial insight (3-4 sentences).
 Be practical, actionable, and clear.
 `;
 
-    const llamaResponse = await axios.post("http://localhost:11434/api/generate", {
-      model: "llama3",
-      prompt,
-      stream: false
-    });
+    try {
+      const llamaResponse = await axios.post("http://localhost:11434/api/generate", {
+        model: "llama3",
+        prompt,
+        stream: false
+      });
 
-    res.status(200).json({
-      totalIncome,
-      totalExpense,
-      balance,
-      categoryBreakdown,
-      insight: llamaResponse.data.response
-    });
+      res.status(200).json({
+        totalIncome,
+        totalExpense,
+        balance,
+        categoryBreakdown,
+        insight: llamaResponse.data.response
+      });
+
+    } catch (aiError) {
+      console.warn("Ollama connection failed, returning offline fallback financial insight.");
+      let insight = `Based on your monthly data, you spent ₹${totalExpense.toLocaleString("en-IN")} out of ₹${totalIncome.toLocaleString("en-IN")} income. `;
+      if (balance < 0) {
+        insight += "**Deficit Warning:** You are currently spending more than your income. We recommend focusing on reducing discretionary expenses in your top categories to avoid accumulating debt.";
+      } else {
+        const rate = totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(0) : 0;
+        insight += `**Savings Rate:** You successfully saved ₹${balance.toLocaleString("en-IN")} (a savings rate of **${rate}%**). Excellent work! Try setting stricter budget limits for next month to further increase this savings margin.`;
+      }
+      res.status(200).json({
+        totalIncome,
+        totalExpense,
+        balance,
+        categoryBreakdown,
+        insight: `[AI Insight (Offline Mode)]: ${insight}`
+      });
+    }
 
   } catch (error) {
     console.error("Insight Error:", error);
