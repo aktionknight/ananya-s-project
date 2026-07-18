@@ -99,10 +99,11 @@ function Profile() {
       try {
         setLoading(true);
 
+       const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
        const [summaryRes, healthRes, txnRes] = await Promise.all([
-  fetch(`/api/transactions/summary`, { headers }),
-  fetch(`/api/health-score?month=${CURRENT_MONTH}`, { headers }),
-  fetch(`/api/transactions`, { headers }),
+  fetch(`${API_BASE}/api/transactions/summary`, { headers }),
+  fetch(`${API_BASE}/api/health-score?month=${CURRENT_MONTH}`, { headers }),
+  fetch(`${API_BASE}/api/transactions`, { headers }),
 ]);
 
         if (summaryRes.ok) setSummary(await summaryRes.json());

@@ -36,7 +36,7 @@ import ExportButton from "./ExportButton";
 import CategoryChart from "./CategoryChart";
 import ThemeToggle from "./ThemeToggle";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5000") + "/api";
 const CURRENT_MONTH = new Date().toISOString().slice(0, 7);
 const CIRCUMFERENCE = 2 * Math.PI * 90;
 

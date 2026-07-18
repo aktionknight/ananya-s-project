@@ -38,7 +38,8 @@ function BudgetPlanner() {
   const fetchBudgetStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/budgets/status?month=${month}`, { headers });
+      const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_BASE}/api/budgets/status?month=${month}`, { headers });
       if (res.ok) {
         const data = await res.json();
         setBudgetStatus(data);
@@ -75,7 +76,8 @@ function BudgetPlanner() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/budgets`, {
+      const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_BASE}/api/budgets`, {
         method: "POST",
         headers,
         body: JSON.stringify({
