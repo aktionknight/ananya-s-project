@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 
-const CURRENT_MONTH = "2026-02";
+const CURRENT_MONTH = new Date().toISOString().slice(0, 7);
 
 function getInitials(name) {
   if (!name) return "?";

@@ -35,13 +35,6 @@ function BudgetPlanner() {
     Authorization: `Bearer ${token}`,
   };
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!token) navigate("/");
-  }, [navigate, token]);
-
-
-
   const fetchBudgetStatus = async () => {
     setLoading(true);
     try {
@@ -56,6 +49,19 @@ function BudgetPlanner() {
       setLoading(false);
     }
   };
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!token) navigate("/");
+  }, [navigate, token]);
+
+  // Fetch budget status on load and on month/token changes
+  useEffect(() => {
+    if (token) {
+      fetchBudgetStatus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [month, token]);
 
   const handleSetBudget = async (e) => {
     e.preventDefault();

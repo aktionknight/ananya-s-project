@@ -1,0 +1,251 @@
+.dashboard-card {
+  width: 430px;
+  padding: 28px;
+  border-radius: 28px;
+  background: rgba(22, 22, 22, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    inset 0 1px rgba(255, 255, 255, 0.04);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.35s ease;
+
+  animation: floatCard 5s ease-in-out infinite;
+}
+
+.dashboard-card:hover {
+  box-shadow:
+    0 40px 100px rgba(34, 197, 94, 0.18);
+}
+
+/* ---------- TOP ---------- */
+
+.dashboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-weight: 700;
+}
+
+.dashboard-brand svg {
+  color: #22C55E;
+}
+
+.dashboard-bell {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #1a1a1a;
+  border-radius: 12px;
+
+  cursor: pointer;
+  transition: .3s;
+}
+
+.dashboard-bell:hover {
+  background: #242424;
+}
+
+/* ---------- BALANCE ---------- */
+
+.balance-section p {
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.balance-section h2 {
+  font-size: 2.6rem;
+  margin-bottom: 10px;
+}
+
+.growth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #22C55E;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+/* ---------- MINI CARDS ---------- */
+
+.mini-cards {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.mini-cards div {
+  background: #181818;
+  border-radius: 16px;
+  padding: 16px;
+
+  transition: .35s;
+}
+
+.mini-cards div:hover {
+  transform: translateY(-4px);
+  background: #202020;
+}
+
+.mini-cards svg {
+  color: #22C55E;
+  margin-bottom: 10px;
+}
+
+.mini-cards span {
+  display: block;
+  color: #888;
+  font-size: .8rem;
+  margin-bottom: 6px;
+}
+
+.mini-cards h4 {
+  color: white;
+}
+
+.chart-container{
+
+margin:35px 0;
+
+padding:20px;
+
+background:#161616;
+
+border-radius:20px;
+
+border:1px solid rgba(255,255,255,.05);
+
+}
+
+.chart-container h4{
+
+margin-bottom:15px;
+
+font-size:.95rem;
+
+color:#cfcfcf;
+
+}
+
+.recharts-cartesian-grid line{
+
+stroke:#222;
+
+}
+
+.recharts-tooltip-wrapper{
+
+outline:none;
+
+}
+.chart{
+
+width:100%;
+
+height:130px;
+
+}
+
+.chart polyline{
+
+stroke-linejoin:round;
+
+stroke-linecap:round;
+
+filter:drop-shadow(0 0 10px rgba(34,197,94,.4));
+
+animation:drawLine 2s ease;
+
+}
+
+.chart circle{
+
+fill:#22C55E;
+
+}
+
+@keyframes drawLine{
+
+from{
+
+stroke-dasharray:400;
+
+stroke-dashoffset:400;
+
+}
+
+to{
+
+stroke-dashoffset:0;
+
+}
+
+}
+/* ---------- TRANSACTIONS ---------- */
+
+.transactions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.transactions div {
+  display: flex;
+  justify-content: space-between;
+
+  border-bottom: 1px solid rgba(255,255,255,.05);
+
+  padding-bottom: 12px;
+}
+
+.transactions span {
+  color: #d6d6d6;
+}
+
+.transactions p {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.transactions .green {
+  color: #22C55E;
+}
+
+/* ---------- FLOAT ---------- */
+
+@keyframes floatCard {
+
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+
+}

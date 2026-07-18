@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import API from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
@@ -8,6 +9,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -21,11 +23,11 @@ function Login() {
         password,
       });
 
-      const token = response.data.token;
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userName", response.data.user.name);
+      localStorage.setItem("userEmail", response.data.user.email);
+      localStorage.setItem("userCreatedAt", response.data.user.createdAt);
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userName", response.data.user.name);   
-      localStorage.setItem("userEmail", response.data.user.email); 
       navigate("/dashboard");
     } catch (err) {
       setError("Login failed. Please check your email and password.");
@@ -35,67 +37,152 @@ function Login() {
   };
 
   return (
-    <div className="login">
-      <div className="login__card">
-        <h1 className="login__title">Welcome back</h1>
-        <p className="login__subtitle">Sign in to your finance tracker</p>
+    <div className="login-page">
 
-        <form onSubmit={handleLogin} className="login__form">
-          {error && (
-            <div className={`login__error login__error--visible`}>{error}</div>
-          )}
+      {/* LEFT PANEL */}
 
-          <div className="login__field">
-            <label htmlFor="email" className="login__label">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="login__input"
-              required
-              disabled={loading}
-            />
+      <div className="login-left">
+
+        <div className="login-logo">
+
+          <div className="logo-box">
+            F
           </div>
 
-          <div className="login__field">
-            <label htmlFor="password" className="login__label">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="login__input"
-              required
-              disabled={loading}
-            />
+          <div>
+
+            <h1>FINOVA</h1>
+
+            <p>SMART FINANCE</p>
+
           </div>
 
-          <button
-            type="submit"
-            className="login__submit"
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
+        </div>
 
-          <p className="login__switch">
-            Don't have an account?{" "}
-            <Link to="/register" className="login__link">
-              Create account
-            </Link>
-          </p>
-          <Link to="/" className="login__back">
-            ← Back to home
-          </Link>
-        </form>
+        <h2>
+          Control your money
+          <br />
+          with confidence.
+        </h2>
+
+        <p>
+          Track expenses, monitor budgets, receive AI-powered insights,
+          and make smarter financial decisions every day.
+        </p>
+
+        <div className="login-features">
+
+          <div>✓ AI Spending Insights</div>
+
+          <div>✓ Smart Budget Planner</div>
+
+          <div>✓ Interactive Analytics</div>
+
+          <div>✓ Secure Cloud Storage</div>
+
+        </div>
+
       </div>
+
+      {/* RIGHT PANEL */}
+
+      <div className="login-right">
+
+        <div className="login">
+
+          <div className="login__card">
+
+            <h1 className="login__title">
+              Welcome Back
+            </h1>
+
+            <p className="login__subtitle">
+              Sign in to continue to Finova
+            </p>
+
+            <form
+              onSubmit={handleLogin}
+              className="login__form"
+            >
+
+              {error && (
+                <div className="login__error login__error--visible">
+                  {error}
+                </div>
+              )}
+
+              <div className="login__field">
+
+                <label className="login__label">
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="login__input"
+                  required
+                  disabled={loading}
+                />
+
+              </div>
+
+              <div className="login__field">
+
+                <label className="login__label">
+                  Password
+                </label>
+
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="login__input"
+                  required
+                  disabled={loading}
+                />
+
+              </div>
+
+              <button
+                type="submit"
+                className="login__submit"
+                disabled={loading}
+              >
+                {loading ? "Signing In..." : "Sign In"}
+              </button>
+
+              <p className="login__switch">
+
+                Don't have an account?{" "}
+
+                <Link
+                  to="/register"
+                  className="login__link"
+                >
+                  Create Account
+                </Link>
+
+              </p>
+
+              <Link
+                to="/"
+                className="login__back"
+              >
+                ← Back to Home
+              </Link>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

@@ -31,7 +31,7 @@ const getAlerts = async (req, res) => {
         .filter(t => t.category === budget.category)
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const usagePercentage = (spent / budget.amount) * 100;
+      const usagePercentage = (spent / budget.monthlyLimit) * 100;
 
       if (usagePercentage >= 100) {
         alerts.push({

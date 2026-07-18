@@ -13,7 +13,7 @@ const setBudget = async (req, res) => {
     }
 
     let budget = await Budget.findOne({
-      user: req.user,
+      user: req.user._id,
       category,
       month
     });
@@ -23,7 +23,7 @@ const setBudget = async (req, res) => {
       await budget.save();
     } else {
       budget = await Budget.create({
-        user: req.user,
+        user: req.user._id,
         category,
         monthlyLimit,
         month
@@ -51,7 +51,7 @@ const getBudgetStatus = async (req, res) => {
     }
 
     const budgets = await Budget.find({
-      user: req.user,
+      user: req.user._id,
       month
     });
 
@@ -65,7 +65,7 @@ const getBudgetStatus = async (req, res) => {
       const spent = await Transaction.aggregate([
         {
           $match: {
-            user: new mongoose.Types.ObjectId(req.user),
+            user: new mongoose.Types.ObjectId(req.user._id),
             category: budget.category,
             type: "expense",
             date: {
@@ -94,7 +94,7 @@ const getBudgetStatus = async (req, res) => {
       }
       if (status !== "SAFE") {
   const existingAlert = await Alert.findOne({
-    user: req.user,
+    user: req.user._id,
     category: budget.category,
     month,
     type: status
@@ -102,7 +102,7 @@ const getBudgetStatus = async (req, res) => {
 
   if (!existingAlert) {
     await Alert.create({
-      user: req.user,
+      user: req.user._id,
       category: budget.category,
       month,
       type: status,
