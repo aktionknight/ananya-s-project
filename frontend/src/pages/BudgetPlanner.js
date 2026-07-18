@@ -1,4 +1,3 @@
-import API_BASE from "../config";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BudgetPlanner.css";
@@ -46,7 +45,7 @@ function BudgetPlanner() {
   const fetchBudgetStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/budgets/status?month=${month}`, { headers });
+      const res = await fetch(`/api/budgets/status?month=${month}`, { headers });
       if (res.ok) {
         const data = await res.json();
         setBudgetStatus(data);
@@ -70,7 +69,7 @@ function BudgetPlanner() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/budgets`, {
+      const res = await fetch(`/api/budgets`, {
         method: "POST",
         headers,
         body: JSON.stringify({

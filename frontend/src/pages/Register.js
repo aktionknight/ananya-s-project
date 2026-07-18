@@ -24,7 +24,7 @@ function Register() {
     setLoading(true);
 
     try {
-      await API.post("/users/signup", form);
+      await API.post("/api/users/signup", form);
       navigate("/login");
     } catch (err) {
       setError(

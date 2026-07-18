@@ -1,4 +1,3 @@
-import API_BASE from "../config";
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
@@ -101,9 +100,9 @@ function Profile() {
         setLoading(true);
 
        const [summaryRes, healthRes, txnRes] = await Promise.all([
-  fetch(`${API_BASE}/api/transactions/summary`, { headers }),
-  fetch(`${API_BASE}/api/health-score?month=${CURRENT_MONTH}`, { headers }),
-  fetch(`${API_BASE}/api/transactions`, { headers }),
+  fetch(`/api/transactions/summary`, { headers }),
+  fetch(`/api/health-score?month=${CURRENT_MONTH}`, { headers }),
+  fetch(`/api/transactions`, { headers }),
 ]);
 
         if (summaryRes.ok) setSummary(await summaryRes.json());

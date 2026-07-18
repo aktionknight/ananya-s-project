@@ -1,4 +1,3 @@
-import API_BASE from "../config";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
@@ -48,7 +47,7 @@ function AddTransaction() {
     setLoading(true);
 
     try {
-      await API.post("/transactions", {
+      await API.post("/api/transactions", {
         ...form,
         amount: parseFloat(form.amount),
       });
